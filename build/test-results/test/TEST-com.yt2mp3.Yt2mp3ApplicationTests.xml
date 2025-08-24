@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.yt2mp3.Yt2mp3ApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-08-21T00:06:58.901Z" hostname="parrot" time="0.405">
+  <properties/>
+  <testcase name="contextLoads()" classname="com.yt2mp3.Yt2mp3ApplicationTests" time="0.405"/>
+  <system-out><![CDATA[02:06:57.797 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.yt2mp3.Yt2mp3ApplicationTests]: Yt2mp3ApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:06:57.858 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.yt2mp3.Yt2mp3Application for test class com.yt2mp3.Yt2mp3ApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.4)
+
+2025-08-21T02:06:58.118+02:00  INFO 10949 --- [    Test worker] com.yt2mp3.Yt2mp3ApplicationTests        : Starting Yt2mp3ApplicationTests using Java 21.0.7 with PID 10949 (started by zjma in /home/zjma/dev/projects/yt2mp3/yt2mp3-spring)
+2025-08-21T02:06:58.119+02:00  INFO 10949 --- [    Test worker] com.yt2mp3.Yt2mp3ApplicationTests        : No active profile set, falling back to 1 default profile: "default"
+2025-08-21T02:06:58.692+02:00 DEBUG 10949 --- [    Test worker] o.s.w.s.s.s.WebSocketHandlerMapping      : Patterns [/ws] in 'stompWebSocketHandlerMapping'
+2025-08-21T02:06:58.724+02:00 DEBUG 10949 --- [    Test worker] .WebSocketAnnotationMethodMessageHandler : 
+	c.y.c.ConvertController:
+	{[MESSAGE],[/download]}: handleConvertRequest(String)
+2025-08-21T02:06:58.725+02:00 DEBUG 10949 --- [    Test worker] .WebSocketAnnotationMethodMessageHandler : 
+	c.y.c.DownloadController:
+	
+2025-08-21T02:06:58.728+02:00 DEBUG 10949 --- [    Test worker] .WebSocketAnnotationMethodMessageHandler : 
+	o.s.b.a.w.s.e.BasicErrorController:
+	
+2025-08-21T02:06:58.883+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : clientOutboundChannel added SubProtocolWebSocketHandler[StompSubProtocolHandler[v10.stomp, v11.stomp, v12.stomp]]
+2025-08-21T02:06:58.883+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : clientInboundChannel added WebSocketAnnotationMethodMessageHandler[prefixes=[/app/]]
+2025-08-21T02:06:58.883+02:00  INFO 10949 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-08-21T02:06:58.884+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : clientInboundChannel added SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4fb57fb3]
+2025-08-21T02:06:58.884+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : brokerChannel added SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4fb57fb3]
+2025-08-21T02:06:58.885+02:00  INFO 10949 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4fb57fb3]]
+2025-08-21T02:06:58.886+02:00  INFO 10949 --- [    Test worker] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-08-21T02:06:58.886+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : clientInboundChannel added UserDestinationMessageHandler[DefaultUserDestinationResolver[prefix=/user/]]
+2025-08-21T02:06:58.886+02:00 DEBUG 10949 --- [    Test worker] o.s.m.s.ExecutorSubscribableChannel      : brokerChannel added UserDestinationMessageHandler[DefaultUserDestinationResolver[prefix=/user/]]
+2025-08-21T02:06:58.894+02:00  INFO 10949 --- [    Test worker] com.yt2mp3.Yt2mp3ApplicationTests        : Started Yt2mp3ApplicationTests in 0.956 seconds (process running for 1.579)
+]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/home/zjma/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.6/17b32fd9f57deef02842f7f05abc4ad8127fe34e/byte-buddy-agent-1.17.6.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
