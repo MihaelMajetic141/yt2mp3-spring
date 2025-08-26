@@ -26,40 +26,33 @@ class ConvertService {
             throw IOException("URL is empty")
 
         val cleanUrl = sanitizeYtUrl(url)
+        logger.info("URL sanitized: $cleanUrl")
+
         val process = ProcessBuilder(
-            "yt-dlp",
+            "/venv/bin/yt-dlp",
             "--print", "%(title)s",
             cleanUrl
         ).start()
+        logger.info("process --print started")
 
         val title = process.inputStream.bufferedReader().readLine()
-
-//        val metadataJson = reader.readLine() ?: throw RuntimeException("No metadata received")
-//
-//        val exit = process.waitFor()
-//        if (exit != 0) {
-//            throw RuntimeException("yt-dlp failed with exit code $exit")
-//        }
-//
-//        // val metadataJson = process.inputStream.bufferedReader().use { it.readText() }
-//
-//        val metadata = jacksonObjectMapper().readTree(metadataJson)
-//        val title = metadata["filename"].asText()
 
         val tempFile = File.createTempFile(title, ".mp3").apply { delete() }
         try {
             val processBuilder = ProcessBuilder(
-                /* ...command = */ "yt-dlp",
+                 "/venv/bin/yt-dlp",
                 "-x", // Extract audio
                 "--audio-format", "mp3",
                 "--audio-quality", "0",
                 "-o", tempFile.absolutePath, // "/tmp/%(title)s.%(ext)s", // tempFile.absolutePath,
                 cleanUrl
             )
-
             val process = processBuilder.start()
+            logger.info("convert to mp3 process started")
 
             val reader = process.inputStream.bufferedReader()
+            logger.info("reader defined")
+
             reader.forEachLine { line ->
                 // logger.debug("yt-dlp: $line")
                 val match = Regex("""(\d+(?:\.\d+)?)%""").find(line)
@@ -68,8 +61,11 @@ class ConvertService {
                     onProgress(percent)
                 }
             }
-            
+            logger.info("reader forEachLine finished")
+
             val exitCode = process.waitFor()
+            logger.info("exitCode reached: $exitCode")
+
 
             if (exitCode != 0) {
                 val errorOutput = process.errorStream.bufferedReader().readText()

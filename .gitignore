@@ -1,0 +1,32 @@
+# Gradle build files
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+gradlew gradlew.bat
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Dependency directories
+/bin/
+/out/
+
+# Local configuration files
+application.properties
+application.yml
+
+# Other common ignores
+.DS_Store
+*.swp
+*.swo
+*.tmp
