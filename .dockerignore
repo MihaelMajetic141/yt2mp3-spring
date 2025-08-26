@@ -1,6 +1,23 @@
-.gradle
-build
+# Ignore everything
+*
+
+# Allow files and directories needed for the build
+!src
+!build.gradle.kts
+!settings.gradle.kts
+!gradle
+!gradlew
+!gradlew.bat
+!README.md
+
+# Ignore unnecessary files
 .git
 .gitignore
-Dockerfile
-*.md
+.idea
+.vscode
+.DS_Store
+.gradle
+build
+*.log
+*.jar
+*.war

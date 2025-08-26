@@ -1,9 +1,0 @@
-server:
-  port: 8080
-
-logging:
-  level:
-    root: INFO
-    com.example.app: DEBUG
-    org.springframework.web.socket: DEBUG
-    org.springframework.messaging: DEBUG
