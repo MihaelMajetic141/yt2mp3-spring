@@ -24,7 +24,7 @@ class ConvertController(
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
 
-    @MessageMapping("/download")
+    @MessageMapping("/convert")
     fun handleConvertRequest(
         @Payload url: String,
         // @Header("simpSessionId") sessionId: String
@@ -36,15 +36,26 @@ class ConvertController(
         // logger.info("Received download request for URL: $url via session: $sessionId")
         coroutineScope.launch {
             try {
-                val file = convertService.convertToMp3(url) { progress ->
+                val videoIdAndTitleMap: Map<String, String> = convertService.extractTitle(url)
+                messagingTemplate.convertAndSend( // ToDo: convertAndSendToUser()
+                    "/queue/videoId",
+                    videoIdAndTitleMap["videoId"].toString(),
+                )
+                messagingTemplate.convertAndSend( // ToDo: convertAndSendToUser()
+                    "/queue/title",
+                    videoIdAndTitleMap["title"].toString(),
+                )
+                val file = convertService.convertToMp3(
+                    videoId = videoIdAndTitleMap["videoId"],
+                    title = videoIdAndTitleMap["title"]
+                ) { progress ->
                     messagingTemplate.convertAndSend( // ToDo: convertAndSendToUser()
                         "/queue/progress",
-                        progress)
+                        progress
+                    )
                 }
                 val downloadId = UUID.randomUUID().toString()
-
                 downloadRegistry.register(downloadId, file)
-
                 val downloadUrl = "http://localhost:8080/api/download/$downloadId"
                 messagingTemplate.convertAndSend(
                     "/queue/mp3",
