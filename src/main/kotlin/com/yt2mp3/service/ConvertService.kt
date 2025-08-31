@@ -28,7 +28,7 @@ class ConvertService {
             val tempFile = File.createTempFile(title, ".mp3").apply { delete() }
 
             val convertToMp3Process = ProcessBuilder(
-                 "yt-dlp", // /venv/bin
+                 "/venv/bin/yt-dlp",
                 "-x", // Extract audio
                 "--audio-format", "mp3",
                 "--audio-quality", "0",
@@ -79,7 +79,7 @@ class ConvertService {
         val videoId = getIdFromUrl(url)
         val cleanUrl = "https://youtube.com/watch?v=${videoId}"
         val extractTitleProcess = ProcessBuilder(
-            "yt-dlp", // /venv/bin
+            "/venv/bin/yt-dlp",
             "--print", "%(title)s",
             cleanUrl
         ).start()
