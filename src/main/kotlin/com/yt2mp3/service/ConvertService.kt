@@ -25,14 +25,14 @@ class ConvertService {
 
         try {
             val url = "https://youtube.com/watch?v=$videoId"
-            val tempFile = File.createTempFile(title, ".mp3").apply { delete() }
+            val tempFile = File.createTempFile(title!!, ".mp3").apply { delete() }
 
             val convertToMp3Process = ProcessBuilder(
-                 "/venv/bin/yt-dlp",
-                "-x", // Extract audio
+                "/venv/bin/yt-dlp",
+                "-x",
                 "--audio-format", "mp3",
                 "--audio-quality", "0",
-                "-o", tempFile.absolutePath, // "/tmp/%(title)s.%(ext)s", // tempFile.absolutePath,
+                "-o", tempFile.absolutePath,
                 url
             ).start()
             logger.info("convert to mp3 process started")
@@ -41,19 +41,13 @@ class ConvertService {
             logger.info("reader defined")
 
             reader.forEachLine { line ->
-                // logger.debug("yt-dlp: $line")
                 val match = Regex("""(\d+(?:\.\d+)?)%""").find(line)
                 if (match != null) {
                     val percent = match.groupValues[1].toDouble().toInt()
                     onProgress(percent)
                 }
             }
-            logger.info("reader forEachLine finished")
-
             val exitCode = convertToMp3Process.waitFor()
-            logger.info("exitCode reached: $exitCode")
-
-
             if (exitCode != 0) {
                 val errorOutput = convertToMp3Process.errorStream.bufferedReader().readText()
                 throw IOException("yt-dlp failed with exit code $exitCode: $errorOutput")
@@ -65,7 +59,6 @@ class ConvertService {
 
             logger.info("Downloaded MP3 file to: ${tempFile.absolutePath}")
             tempFile
-
         } catch (e: Exception) {
             throw e
         }
