@@ -15,9 +15,7 @@ class ConvertService {
     private val logger = LoggerFactory.getLogger(ConvertService::class.java)
 
     suspend fun convertToMp3(
-        videoId: String?,
-        title: String?,
-        onProgress: (Int) -> Unit
+        videoId: String?, title: String?, onProgress: (Int) -> Unit
     ): File = withContext(Dispatchers.IO) {
 
         if (videoId?.isEmpty() == true || title?.isEmpty() == true)
@@ -28,10 +26,12 @@ class ConvertService {
             val tempFile = File.createTempFile(title!!, ".mp3").apply { delete() }
 
             val convertToMp3Process = ProcessBuilder(
-                "/venv/bin/yt-dlp",
+                "yt-dlp",
                 "-x",
                 "--audio-format", "mp3",
                 "--audio-quality", "0",
+                "--add-metadata",
+                "--embed-thumbnail",
                 "-o", tempFile.absolutePath,
                 url
             ).start()
@@ -64,15 +64,62 @@ class ConvertService {
         }
     }
 
+    suspend fun convertToMp4(
+        videoId: String?, title: String?, onProgress: (Int) -> Unit
+    ): File = withContext(Dispatchers.IO) {
+
+        if (videoId?.isEmpty() == true || title?.isEmpty() == true)
+            throw IOException("Function parameter is empty: \nvideoId=$videoId \ntitle=$title")
+
+        try {
+            val url = "https://youtube.com/watch?v=$videoId"
+            val tempFile = File.createTempFile(title!!, ".mp4").apply { delete() }
+
+            val convertToMp4Process = ProcessBuilder(
+                "yt-dlp",
+                "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
+                "--add-metadata",
+                "--embed-thumbnail",
+                "-o", tempFile.absolutePath,
+                url
+            ).start()
+            logger.info("convert to mp4 process started")
+
+            val reader = convertToMp4Process.inputStream.bufferedReader()
+            logger.info("reader defined")
+
+            reader.forEachLine { line ->
+                val match = Regex("""(\d+(?:\.\d+)?)%""").find(line)
+                if (match != null) {
+                    val percent = match.groupValues[1].toDouble().toInt()
+                    onProgress(percent)
+                }
+            }
+            val exitCode = convertToMp4Process.waitFor()
+            if (exitCode != 0) {
+                val errorOutput = convertToMp4Process.errorStream.bufferedReader().readText()
+                throw IOException("yt-dlp failed with exit code $exitCode: $errorOutput")
+            }
+
+            if (!tempFile.exists() || tempFile.length() == 0L) {
+                throw IOException("Downloaded file is empty or does not exist")
+            }
+
+            logger.info("Downloaded MP4 file to: ${tempFile.absolutePath}")
+            tempFile
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     suspend fun extractTitle(
         url: String
     ): Map<String, String> {
         val videoIdAndTitleMap: MutableMap<String, String> = mutableMapOf()
-
         val videoId = getIdFromUrl(url)
         val cleanUrl = "https://youtube.com/watch?v=${videoId}"
         val extractTitleProcess = ProcessBuilder(
-            "/venv/bin/yt-dlp",
+            "yt-dlp",
             "--print", "%(title)s",
             cleanUrl
         ).start()

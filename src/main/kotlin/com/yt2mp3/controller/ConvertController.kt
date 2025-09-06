@@ -28,19 +28,43 @@ class ConvertController(
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + job)
 
-    @MessageMapping("/convert")
-    fun handleConvertRequest(
-        @Payload url: String,
+    @MessageMapping("/convertToMp3")
+    fun handleConvertToMp3(
+        @Payload(required = false) url: String?,
         @Header("simpSessionId") sessionId: String
     ) {
-        if (url.trim().isEmpty()) {
-            sendError(sessionId, "Empty URL provided")
+        handleConvertRequest(url, sessionId, format = "mp3")
+    }
+
+    @MessageMapping("/convertToMp4")
+    fun handleConvertToMp4(
+        @Payload(required = false) url: String?,
+        @Header("simpSessionId") sessionId: String
+    ) {
+        handleConvertRequest(url, sessionId, format = "mp4")
+    }
+
+    private fun handleConvertRequest(
+        url: String?,
+        sessionId: String,
+        format: String
+    ) {
+        if (url.isNullOrBlank()) {
+            sendError(sessionId, "Empty or invalid URL provided")
             return
         }
-        logger.info("Received download request for URL: $url via session: $sessionId")
+        val youtubeRegex =
+            Regex("^(https?://)?(www\\.)?(youtube\\.com|music\\.youtube\\.com|youtu\\.be)/(watch\\?v=)?[a-zA-Z0-9_-]{11}.*$")
+        if (!youtubeRegex.matches(url)) {
+            sendError(sessionId, "Invalid YouTube URL")
+            return
+        }
+
+        logger.info("Received $format conversion request for URL: $url via session: $sessionId")
         coroutineScope.launch {
             try {
                 val videoIdAndTitleMap: Map<String, String> = convertService.extractTitle(url)
+
                 messagingTemplate.convertAndSendToUser(
                     sessionId,
                     "/queue/videoId",
@@ -53,31 +77,46 @@ class ConvertController(
                     videoIdAndTitleMap["title"].toString(),
                     createHeaders(sessionId)
                 )
-                val file = convertService.convertToMp3(
-                    videoId = videoIdAndTitleMap["videoId"],
-                    title = videoIdAndTitleMap["title"]
-                ) { progress ->
-                    messagingTemplate.convertAndSendToUser(
-                        sessionId,
-                        "/queue/progress",
-                        progress,
-                        createHeaders(sessionId)
-                    )
+
+                val file = when (format) {
+                    "mp3" -> convertService.convertToMp3(
+                        videoId = videoIdAndTitleMap["videoId"],
+                        title = videoIdAndTitleMap["title"]
+                    ) { progress ->
+                        messagingTemplate.convertAndSendToUser(
+                            sessionId,
+                            "/queue/progress",
+                            progress,
+                            createHeaders(sessionId)
+                        )
+                    }
+                    "mp4" -> convertService.convertToMp4(
+                        videoId = videoIdAndTitleMap["videoId"],
+                        title = videoIdAndTitleMap["title"]
+                    ) { progress ->
+                        messagingTemplate.convertAndSendToUser(
+                            sessionId,
+                            "/queue/progress",
+                            progress,
+                            createHeaders(sessionId)
+                        )
+                    }
+                    else -> throw IllegalArgumentException("Unsupported format: $format")
                 }
+
                 val downloadId = UUID.randomUUID().toString()
                 downloadRegistry.register(downloadId, file)
                 val downloadUrl = "http://localhost:8080/api/download/$downloadId"
 
                 messagingTemplate.convertAndSendToUser(
                     sessionId,
-                    "/queue/mp3",
+                    "/queue/download",
                     downloadUrl,
                     createHeaders(sessionId)
                 )
-
             } catch (e: Exception) {
-                logger.error("Error processing download for session $sessionId: ${e.message}", e)
-                sendError("sessionId", "Error: ${e.message}")
+                logger.error("Error processing $format download for session $sessionId: ${e.message}", e)
+                sendError(sessionId, "Error: ${e.message}")
             }
         }
     }
